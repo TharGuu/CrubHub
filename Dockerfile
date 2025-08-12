@@ -1,24 +1,22 @@
-# 1) Build frontend assets
+# --- Build Vite assets ---
 FROM node:18-alpine AS assets
 WORKDIR /app
 COPY package*.json vite.config.js ./
 COPY resources ./resources
-RUN npm ci && npm run build   # creates /app/public/build
+RUN npm ci && npm run build      # -> /app/public/build
 
-# 2) PHP + Apache
+# --- PHP + Apache ---
 FROM php:8.2-apache
-
 RUN a2enmod rewrite
 RUN apt-get update && apt-get install -y \
     git unzip libzip-dev libpng-dev libonig-dev \
  && docker-php-ext-install pdo pdo_mysql zip gd
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
 WORKDIR /var/www/html
 COPY . .
 
-# Copy built assets from Node stage
+# copy compiled assets into the image
 COPY --from=assets /app/public/build ./public/build
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -26,7 +24,8 @@ RUN sed -ri 's#/var/www/html#/var/www/html/public#g' \
     /etc/apache2/sites-available/000-default.conf /etc/apache2/apache2.conf
 
 RUN composer install --no-dev --optimize-autoloader
-RUN php artisan key:generate --force || true && php artisan storage:link || true
+RUN php artisan key:generate --force || true \
+ && php artisan storage:link || true \
+ && php artisan config:clear || true
 
-EXPOSE 8080
 CMD ["apache2-foreground"]
