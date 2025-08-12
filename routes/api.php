@@ -11,6 +11,9 @@ Route::post('/login', [AuthController::class,'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class,'logout']);
 
+    Route::get('/stream/comments',  [StreamCommentController::class,'index']);
+    Route::post('/stream/comments', [StreamCommentController::class,'store']);
+
     Route::get('/posts', [ApiPostController::class,'index']);
     Route::post('/posts', [ApiPostController::class,'store']);
     Route::get('/posts/{post}', [ApiPostController::class,'show']);
@@ -20,3 +23,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts/{post}/comments', [ApiCommentController::class,'store']);
     Route::get('/posts/{post}/comments', [ApiCommentController::class,'index']);
 });
+
+Route::get('/ping', fn() => 'pong');

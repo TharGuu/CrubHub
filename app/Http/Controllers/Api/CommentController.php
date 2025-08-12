@@ -27,4 +27,3 @@ class CommentController extends Controller
         return response()->json($comment->load('user:id,name'), 201);
     }
 }
-
