@@ -3,16 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StreamComment extends Model
 {
-    use HasFactory;
+    protected $fillable = ['body','user_id'];
 
-    protected $fillable = ['user_id','body'];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    public function user() { return $this->belongsTo(User::class); }
 }
